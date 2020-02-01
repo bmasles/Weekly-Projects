@@ -7,8 +7,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 /**
  * Week 1 Project Basic Library System using files
@@ -17,43 +22,31 @@ import java.util.Scanner;
  *
  */
 
-
-
 /*
- * TODO Convert everything to Hashmap cause that is what they said and it will be easier to search for IDs
- * TODO implement delete (requires the ability to search by ID)
- * TODO delete old entries when updating
+ * X TODO Convert the Book file and class to accommodate IDs instead of names X
+ * TODO Convert everything to Hashmap cause that is what they said and it will
+ * be easier to search for IDs TODO implement delete (requires the ability to
+ * search by ID) X TODO delete old entries when updating TODO get some lambda
+ * functions in that bad boy
  */
-
-
-
-
-
-
-
-
-
-
-
-
 
 public class LibraryManagementSystem {
 
-	private List<String> bookLines = null, publisherLines = null, authorLines = null;
-	private ArrayList<Book> books = new ArrayList<Book>();
-	private ArrayList<Publisher> publishers = new ArrayList<Publisher>();
-	private ArrayList<Author> authors = new ArrayList<Author>();
+	private ArrayList<String> bookLines = null, publisherLines = null, authorLines = null;
+	private HashMap<Integer, Book> books = new HashMap<Integer, Book>();
+	private HashMap<Integer, Publisher> publishers = new HashMap<Integer, Publisher>();
+	private HashMap<Integer, Author> authors = new HashMap<Integer, Author>();
 	private Scanner consoleInput;
 	int bookId, publisherId, authorId;
-	private String folderName;
+	private String folderName, delim;
 
 	LibraryManagementSystem(String folderName) {
 		consoleInput = new Scanner(System.in);
 		this.folderName = folderName;
 		try {
-			bookLines = Files.readAllLines(Paths.get(folderName + "/books"));
-			publisherLines = Files.readAllLines(Paths.get(folderName + "/publishers"));
-			authorLines = Files.readAllLines(Paths.get(folderName + "/authors"));
+			bookLines = (ArrayList<String>) Files.readAllLines(Paths.get(folderName + "/books"));
+			publisherLines = (ArrayList<String>) Files.readAllLines(Paths.get(folderName + "/publishers"));
+			authorLines = (ArrayList<String>) Files.readAllLines(Paths.get(folderName + "/authors"));
 		} catch (IOException e) {
 			System.out.println("Failed to read the file: " + e.getMessage());
 			System.exit(0);
@@ -61,15 +54,17 @@ public class LibraryManagementSystem {
 		bookId = Character.getNumericValue(bookLines.get(bookLines.size() - 1).charAt(0));
 		publisherId = Character.getNumericValue(publisherLines.get(publisherLines.size() - 1).charAt(0));
 		authorId = Character.getNumericValue(authorLines.get(authorLines.size() - 1).charAt(0));
-		String delim = "[\t]";
+		delim = "[\t]";
+		// books = (Hashmap<Integer,Book>)bookLines.stream()
+//		.collect(Collectors.toMap(x -> x.charAt(0), x -> lambdaBook(x), null, () -> new HashMap<>()));
 		for (String lines : bookLines) {
 			Book bk = new Book();
 			String[] words = lines.split(delim);
 			bk.setId(Integer.parseInt(words[0]));
 			bk.setName(words[1]);
-			bk.setPublisher(words[2]);
-			bk.setAuthor(words[3]);
-			books.add(bk);
+			bk.setPublisherId(Integer.parseInt(words[2]));
+			bk.setAuthorId(Integer.parseInt(words[3]));
+			books.put(bk.getId(), bk);
 		}
 		for (String lines : authorLines) {
 			Author aut = new Author();
@@ -77,7 +72,7 @@ public class LibraryManagementSystem {
 			aut.setId(Integer.parseInt(words[0]));
 			aut.setName(words[1]);
 			aut.setAddress(words[2]);
-			authors.add(aut);
+			authors.put(aut.getId(), aut);
 		}
 		for (String lines : publisherLines) {
 			Publisher pub = new Publisher();
@@ -85,8 +80,18 @@ public class LibraryManagementSystem {
 			pub.setId(Integer.parseInt(words[0]));
 			pub.setName(words[1]);
 			pub.setAddress(words[2]);
-			publishers.add(pub);
+			publishers.put(pub.getId(), pub);
 		}
+	}
+
+	public Book lambdaBook(String line) {
+		Book bk = new Book();
+		String[] words = line.split(delim);
+		bk.setId(Integer.parseInt(words[0]));
+		bk.setName(words[1]);
+		bk.setPublisherId(Integer.parseInt(words[2]));
+		bk.setAuthorId(Integer.parseInt(words[3]));
+		return bk;
 	}
 
 	public void subMenu(String type) {
@@ -118,7 +123,7 @@ public class LibraryManagementSystem {
 					updateBook();
 					break;
 				case 4:
-					// deleteBook();
+					deleteBook();
 					break;
 				default:
 					System.out.println("Please enter a valid number");
@@ -137,7 +142,7 @@ public class LibraryManagementSystem {
 					updateAuthor();
 					break;
 				case 4:
-					// deleteAuthor();
+					deleteAuthor();
 					break;
 				default:
 					System.out.println("Please enter a valid number");
@@ -156,7 +161,7 @@ public class LibraryManagementSystem {
 					updatePublisher();
 					break;
 				case 4:
-					// deletePublisher();
+					deletePublisher();
 					break;
 				default:
 					System.out.println("Please enter a valid number");
@@ -241,30 +246,35 @@ public class LibraryManagementSystem {
 	}
 
 	private void readBook() {
-		for (Book bk : books) {
-			System.out.format("%-3d%-25s%-20s%-10s%n", bk.getId(), bk.getName(), bk.getAuthor(), bk.getPublisher());
+		for (Entry<Integer, Book> bk : books.entrySet()) {
+			System.out.format("%-3d%-25s%-20s%-10s%n", bk.getValue().getId(), bk.getValue().getName(),
+					bk.getValue().getAuthorId(), bk.getValue().getPublisherId());
 		}
 		System.out.println();
 	}
 
 	private void readAuthor() {
-		for (Author aut : authors) {
-			System.out.format("%-3d%-20s%-20s%n", aut.getId(), aut.getName(), aut.getAddress());
+		for (Entry<Integer, Author> aut : authors.entrySet()) {
+			System.out.format("%-3d%-20s%-20s%n", aut.getValue().getId(), aut.getValue().getName(),
+					aut.getValue().getAddress());
 		}
 		System.out.println();
 	}
 
 	private void readPublisher() {
-		for (Publisher pub : publishers) {
-			System.out.format("%-3d%-10s%-20s%n", pub.getId(), pub.getName(), pub.getAddress());
+		for (Entry<Integer, Publisher> pub : publishers.entrySet()) {
+			System.out.format("%-3d%-10s%-20s%n", pub.getValue().getId(), pub.getValue().getName(),
+					pub.getValue().getAddress());
 		}
 		System.out.println();
 	}
 
 	private void createBook(int id) {
 		Book bk = new Book();
-		StringBuilder str = new StringBuilder();
+//		StringBuilder str = new StringBuilder();
 		int decision = -1;
+		int returnNumAuthor = authors.get(authors.size()).getId() + 2;
+		int returnNumPublisher = publishers.get(publishers.size()).getId() + 2;
 		boolean finished = false;
 		do {
 			System.out.println("What is the name of the book?");
@@ -275,79 +285,61 @@ public class LibraryManagementSystem {
 				continue;
 			}
 			System.out.println("Who is the author of this book?");
-			str.replace(0, str.length(), consoleInput.nextLine());
-			if (bk.getAuthor().length() > 20) {
-				System.out
-						.println("Please input a name that is smaller than 20 characters long, " + "returning to menu");
-				continue;
+			readAuthor();
+			System.out.println((returnNumAuthor - 1) + ". New Author");
+			System.out.println(returnNumAuthor + ". Return to Main Menu");
+			try {
+				decision = consoleInput.nextInt();
+				consoleInput.nextLine();
+			} catch (Exception e) {
+				System.out.println("Please input a number for the selection");
 			}
-			bk.setAuthor(str.toString());
-			// authors.contains(new Author(0, str.toString(), ""))
-			if (!containsEntity(authors, str.toString())) {
-				System.out.println("This author is not in the datebase");
-				System.out.println("1. Create new author");
-				System.out.println("2. Redo book creation");
-				try {
-					decision = consoleInput.nextInt();
-					consoleInput.nextLine();
-				} catch (Exception e) {
-					System.out.println("Please input a number for the selection");
-				}
-				switch (decision) {
-				case 1:
-					createAuthor(str.toString());
-					break;
-				case 2:
-					continue;
-				default:
-					System.out.println("Invalid number, returning to main menu without saving");
-				}
-				System.out.println("Author creation finished, returning to book creation");
+			if (decision > returnNumAuthor) {
+				System.out.println("Please enter a valid number");
+				return;
 			}
+			if (decision == returnNumAuthor - 1)
+				decision = createAuthor(-1);
+			else if (decision == returnNumAuthor) {
+				System.out.println("Cancelling creation");
+				return;
+			}
+			bk.setAuthorId(decision);
 			System.out.println("Who published this book?");
-			str.replace(0, str.length(), consoleInput.nextLine());
-			if (bk.getPublisher().length() > 10) {
-				System.out
-						.println("Please input a name that is smaller than 10 characters long, " + "returning to menu");
+			readPublisher();
+			System.out.println((returnNumPublisher - 1) + ". New Publisher");
+			System.out.println(returnNumPublisher + ". Return to Main Menu");
+			try {
+				decision = consoleInput.nextInt();
+				consoleInput.nextLine();
+			} catch (Exception e) {
+				System.out.println("Please input a number for the selection");
+			}
+			if (decision > returnNumAuthor) {
+				System.out.println("Please enter a valid number");
+				return;
+			}
+			if (decision == returnNumPublisher - 1)
+				decision = createPublisher(-1);
+			else if (decision == returnNumPublisher) {
+				System.out.println("Cancelling creation");
 				continue;
 			}
-			bk.setPublisher(str.toString());
-			// publishers.contains(new Publisher(0, str.toString(), ""))
-			if (!containsEntity(publishers, str.toString())) {
-				System.out.println("This publisher is not in the datebase");
-				System.out.println("1. Create new publisher");
-				System.out.println("2. Redo book creation");
-				try {
-					decision = consoleInput.nextInt();
-					consoleInput.nextLine();
-				} catch (Exception e) {
-					System.out.println("Please input a number for the selection");
-				}
-				switch (decision) {
-				case 1:
-					createPublisher(str.toString());
-					break;
-				case 2:
-					continue;
-				default:
-					System.out.println("Invalid number, returning to main menu without saving");
-				}
-				System.out.println("Publisher creation finished, returning to book creation");
-			}
+			bk.setPublisherId(decision);
 			finished = true;
 		} while (!finished);
 		if (id == -1) {
 			bk.setId(++bookId);
-			books.add(bk);
+			books.put(bk.getId(), bk);
 			System.out.println("Book '" + bk.getName() + "' has been added, rememeber to save!");
 		} else {
 			bk.setId(id);
-			books.add(bk);
+			books.replace(id, bk);
 			System.out.println("Book '" + bk.getName() + "' has been updated, rememeber to save!");
 		}
 	}
 
-	private void createAuthor(int id) {
+	private int createAuthor(int id) {
 		Author aut = new Author();
 		StringBuilder str = new StringBuilder();
 		do {
@@ -364,36 +356,116 @@ public class LibraryManagementSystem {
 			aut.setAddress(str.toString());
 			if (id == -1) {
 				aut.setId(++authorId);
-				authors.add(aut);
+				authors.put(aut.getId(), aut);
 				System.out.println("Author '" + aut.getName() + "' has been added, remember to save!");
 			} else {
 				aut.setId(id);
-				authors.add(aut);
+				authors.put(aut.getId(), aut);
 				System.out.println("Author '" + aut.getName() + "' has been updated, remember to save!");
 			}
 		} while (false);
+		return aut.getId();
 	}
 
-	private void createAuthor(String name) {
-		Author aut = new Author();
-		StringBuilder str = new StringBuilder();
+	private void deleteBook(int id) {
+		books.remove(id);
+	}
+
+	private void deleteBook() {
+		int returnNum = books.get(books.size()).getId() + 1, decision = -1;
 		do {
-			if (str.length() > 20) {
-				System.out
-						.println("Please input a name that is smaller than 20 characters long, " + "returning to menu");
-				continue;
+			System.out.println("Which book would you like to delete?");
+			readBook();
+			System.out.println(returnNum + ". Return to Main Menu");
+			try {
+				decision = consoleInput.nextInt();
+				consoleInput.nextLine();
+			} catch (Exception e) {
+				System.out.println("Please input a number for the selection");
 			}
-			aut.setName(name);
-			System.out.println("What is the address of the author?");
-			str.replace(0, str.length(), consoleInput.nextLine());
-			aut.setAddress(str.toString());
-			aut.setId(++authorId);
-			authors.add(aut);
-			System.out.println("Author '" + aut.getName() + "' has been added, remember to save!");
-		} while (false);
+			if (decision > returnNum) {
+				System.out.println("Please enter a valid number");
+				return;
+			}
+			if (decision == returnNum - 1)
+				deleteBook(decision);
+			else if (decision == returnNum) {
+				System.out.println("Cancelling creation");
+				return;
+			}
+			break;
+		} while (true);
 	}
 
-	private void createPublisher(int id) {
+	private void deleteAuthor(int id) {
+		books.forEach((bookId, bk) -> {
+			if (bk.getAuthorId() == id)
+				deleteBook(bookId);
+		});
+		authors.remove(id);
+	}
+
+	private void deleteAuthor() {
+		int returnNum = authors.get(authors.size()).getId() + 1, decision = -1;
+		do {
+			System.out.println("Which author would you like to delete?");
+			readAuthor();
+			System.out.println(returnNum + ". Return to Main Menu");
+			try {
+				decision = consoleInput.nextInt();
+				consoleInput.nextLine();
+			} catch (Exception e) {
+				System.out.println("Please input a number for the selection");
+			}
+			if (decision > returnNum) {
+				System.out.println("Please enter a valid number");
+				return;
+			}
+			if (decision == returnNum - 1)
+				deleteAuthor(decision);
+			else if (decision == returnNum) {
+				System.out.println("Cancelling creation");
+				return;
+			}
+			break;
+		} while (true);
+	}
+
+	private void deletePublisher(int id) {
+		books.forEach((bookId, bk) -> {
+			if (bk.getPublisherId() == id)
+				deleteBook(bookId);
+		});
+		publishers.remove(id);
+	}
+
+	private void deletePublisher() {
+		int returnNum = publishers.get(publishers.size()).getId() + 1, decision = -1;
+		do {
+			System.out.println("Which publisher would you like to delete?");
+			readPublisher();
+			System.out.println(returnNum + ". Return to Main Menu");
+			try {
+				decision = consoleInput.nextInt();
+				consoleInput.nextLine();
+			} catch (Exception e) {
+				System.out.println("Please input a number for the selection");
+			}
+			if (decision > returnNum) {
+				System.out.println("Please enter a valid number");
+				return;
+			}
+			if (decision == returnNum - 1)
+				deletePublisher(decision);
+			else if (decision == returnNum) {
+				System.out.println("Cancelling creation");
+				return;
+			}
+			break;
+		} while (true);
+	}
+
+	private int createPublisher(int id) {
 		Publisher pub = new Publisher();
 		StringBuilder str = new StringBuilder();
 		do {
@@ -409,37 +481,19 @@ public class LibraryManagementSystem {
 			str.replace(0, str.length(), consoleInput.nextLine());
 			pub.setAddress(str.toString());
 			pub.setId(++publisherId);
-			publishers.add(pub);
+			publishers.put(pub.getId(), pub);
 			System.out.println("Publisher '" + pub.getName() + "' has been added, remember to save!");
 			if (id == -1) {
 				pub.setId(++publisherId);
-				publishers.add(pub);
+				publishers.put(pub.getId(), pub);
 				System.out.println("Publisher '" + pub.getName() + "' has been added, remember to save!");
 			} else {
 				pub.setId(id);
-				publishers.add(pub);
+				publishers.put(pub.getId(), pub);
 				System.out.println("Publisher '" + pub.getName() + "' has been updated, remember to save!");
 			}
 		} while (false);
-	}
-
-	private void createPublisher(String name) {
-		Publisher pub = new Publisher();
-		StringBuilder str = new StringBuilder();
-		do {
-			if (str.length() > 10) {
-				System.out
-						.println("Please input a name that is smaller than 10 characters long, " + "returning to menu");
-				continue;
-			}
-			pub.setName(name);
-			System.out.println("What is the address of the publisher?");
-			str.replace(0, str.length(), consoleInput.nextLine());
-			pub.setAddress(str.toString());
-			pub.setId(++publisherId);
-			publishers.add(pub);
-			System.out.println("Publisher '" + pub.getName() + "' has been added, remember to save!");
-		} while (false);
+		return pub.getId();
 	}
 
 	private void save() {
@@ -447,25 +501,28 @@ public class LibraryManagementSystem {
 		bookLines.clear();
 		authorLines.clear();
 		publisherLines.clear();
-		for (Book bk : books) {
-			line.append(bk.getId() + "\t");
-			line.append(bk.getName() + "\t");
-			line.append(bk.getPublisher() + "\t");
-			line.append(bk.getAuthor());
+		// TODO mapFlat to lines
+		// bookLines = (ArrayList<String>) books.entrySet().stream().flatMap(x ->
+		// x.getValue()).collect(Collectors.toList());
+		for (Entry<Integer, Book> bk : books.entrySet()) {
+			line.append(bk.getValue().getId() + "\t");
+			line.append(bk.getValue().getName() + "\t");
+			line.append(bk.getValue().getPublisherId() + "\t");
+			line.append(bk.getValue().getAuthorId());
 			bookLines.add(line.toString());
 			line.replace(0, line.length(), "");
 		}
-		for (Author aut : authors) {
-			line.append(aut.getId() + "\t");
-			line.append(aut.getName() + "\t");
-			line.append(aut.getAddress());
+		for (Entry<Integer, Author> aut : authors.entrySet()) {
+			line.append(aut.getValue().getId() + "\t");
+			line.append(aut.getValue().getName() + "\t");
+			line.append(aut.getValue().getAddress());
 			authorLines.add(line.toString());
 			line.replace(0, line.length(), "");
 		}
-		for (Publisher pub : publishers) {
-			line.append(pub.getId() + "\t");
-			line.append(pub.getName() + "\t");
-			line.append(pub.getAddress());
+		for (Entry<Integer, Publisher> pub : publishers.entrySet()) {
+			line.append(pub.getValue().getId() + "\t");
+			line.append(pub.getValue().getName() + "\t");
+			line.append(pub.getValue().getAddress());
 			publisherLines.add(line.toString());
 			line.replace(0, line.length(), "");
 		}
@@ -498,7 +555,6 @@ public class LibraryManagementSystem {
 			}
 			switch (decision) {
 			case 1:
-				// TODO Remember that the whole CRUD menu needs to go here, not create
 				subMenu("book");
 				break;
 			case 2:
@@ -521,9 +577,6 @@ public class LibraryManagementSystem {
 		consoleInput.close();
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		LibraryManagementSystem lms = new LibraryManagementSystem("resources");
 		lms.mainMenu();

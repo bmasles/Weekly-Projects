@@ -8,21 +8,21 @@ package com.SmoothStack.WeeklyProjects.ProjectOne;
  *
  */
 public class Book implements Entity {
-	int id;
-	String name, publisher, author;
+	int id, authorId, publisherId;
+	String name;
 
 	Book() {
 		id = -1;
 		name = "Error";
-		publisher = "Error";
-		author = "Error";
+		publisherId = -1;
+		authorId = -1;
 	}
 
-	Book(int id, String name, String publisher, String author) {
+	Book(int id, String name, int publisherId, int authorId) {
 		this.id = id;
 		this.name = name;
-		this.publisher = publisher;
-		this.author = author;
+		this.publisherId = publisherId;
+		this.authorId = authorId;
 	}
 
 	@Override
@@ -45,27 +45,30 @@ public class Book implements Entity {
 		this.name = name;
 	}
 
-	public String getPublisher() {
-		return publisher;
+	public int getPublisherId() {
+		return publisherId;
 	}
 
-	public void setPublisher(String publisher) {
-		this.publisher = publisher;
+	public void setPublisherId(int publisherId) {
+		this.publisherId = publisherId;
 	}
 
-	public String getAuthor() {
-		return author;
+	public int getAuthorId() {
+		return authorId;
 	}
 
-	public void setAuthor(String author) {
-		this.author = author;
+	public void setAuthorId(int authorId) {
+		this.authorId = authorId;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + authorId;
+		result = prime * result + id;
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + publisherId;
 		return result;
 	}
 
@@ -78,12 +81,21 @@ public class Book implements Entity {
 		if (getClass() != obj.getClass())
 			return false;
 		Book other = (Book) obj;
+		if (authorId != other.authorId)
+			return false;
+		if (id != other.id)
+			return false;
 		if (name == null) {
 			if (other.name != null)
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
+		if (publisherId != other.publisherId)
+			return false;
 		return true;
 	}
+
+	
+	
 
 }
