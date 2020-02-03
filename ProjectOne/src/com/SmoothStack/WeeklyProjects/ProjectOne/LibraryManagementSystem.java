@@ -21,14 +21,6 @@ import java.util.Scanner;
  *
  */
 
-/*
- * X TODO Convert the Book file and class to accommodate IDs instead of names X
- * TODO Convert everything to Hashmap cause that is what they said and it will
- * be easier to search for IDs TODO implement delete (requires the ability to
- * search by ID) X TODO delete old entries when updating TODO get some lambda
- * functions in that bad boy
- */
-
 public class LibraryManagementSystem {
 
 	private ArrayList<String> bookLines = null, publisherLines = null, authorLines = null;
@@ -47,17 +39,20 @@ public class LibraryManagementSystem {
 		delim = "[\t]";
 		try {
 			//bookLines = (ArrayList<String>) Files.readAllLines(Paths.get(folderName + "/books"));
-			books = Files.lines(Paths.get(folderName + "/books")).collect(Collectors.toMap(x -> {
+			books = Files.readAllLines(Paths.get(folderName + "/books")).stream()
+					.collect(Collectors.toMap(x -> {
 				String words[] = x.split(delim);
 				return Integer.parseInt(words[0]);
 			}, x -> lambdaBook(x)));
 			//publisherLines = (ArrayList<String>) Files.readAllLines(Paths.get(folderName + "/publishers"));
-			authors = Files.lines(Paths.get(folderName + "/authors")).collect(Collectors.toMap(x -> {
+			authors = Files.readAllLines(Paths.get(folderName + "/authors")).stream()
+					.collect(Collectors.toMap(x -> {
 				String words[] = x.split(delim);
 				return Integer.parseInt(words[0]);
 			}, x -> lambdaAuthor(x)));
 			//authorLines = (ArrayList<String>) Files.readAllLines(Paths.get(folderName + "/authors"));
-			publishers = Files.lines(Paths.get(folderName + "/publishers")).collect(Collectors.toMap(x -> {
+			publishers = Files.readAllLines(Paths.get(folderName + "/publishers")).stream()
+					.collect(Collectors.toMap(x -> {
 				String words[] = x.split(delim);
 				return Integer.parseInt(words[0]);
 			}, x -> lambdaPublisher(x)));
@@ -65,12 +60,9 @@ public class LibraryManagementSystem {
 			System.out.println("Failed to read the file: " + e.getMessage());
 			System.exit(0);
 		}
-		bookId = Collections.max(books.keySet());
-		publisherId = Collections.max(publishers.keySet());
-		authorId = Collections.max(authors.keySet());
-		//bookId = Character.getNumericValue(bookLines.get(bookLines.size() - 1).charAt(0));
-//		publisherId = Character.getNumericValue(publisherLines.get(publisherLines.size() - 1).charAt(0));
-//		authorId = Character.getNumericValue(authorLines.get(authorLines.size() - 1).charAt(0));
+		bookId = getMaxId(books);
+		publisherId = getMaxId(publishers);
+		authorId = getMaxId(authors);
 //		for (String lines : bookLines) {
 //			Book bk = new Book();
 //			String[] words = lines.split(delim);
@@ -96,6 +88,10 @@ public class LibraryManagementSystem {
 //			pub.setAddress(words[2]);
 //			publishers.put(pub.getId(), pub);
 //		}
+	}
+	
+	public <E extends Entity> Integer getMaxId(Map<Integer, E> mp) {
+		return Collections.max(mp.keySet());
 	}
 
 	public Book lambdaBook(String line) {
@@ -209,25 +205,9 @@ public class LibraryManagementSystem {
 		} while (true);
 	}
 
-	public <T extends Entity> boolean containsEntity(ArrayList<T> entityList, int id) {
-		for (T entity : entityList) {
-			if (entity.getId() == id)
-				return true;
-		}
-		return false;
-	}
-
-	public <T extends Entity> boolean containsEntity(ArrayList<T> entityList, String name) {
-		for (T entity : entityList) {
-			if (entity.getName().equals(name))
-				return true;
-		}
-		return false;
-	}
-
 	private void updateBook() {
 		int decision = -1;
-		int returnNum = books.get(books.size() - 1).getId() + 1;
+		int returnNum = books.get(books.size()).getId() + 1;
 		System.out.println("Select a book you would like to update");
 		readBook();
 		System.out.println(returnNum + ". Return to Main Menu");
@@ -320,7 +300,6 @@ public class LibraryManagementSystem {
 
 	private void createBook(int id) {
 		Book bk = new Book();
-//		StringBuilder str = new StringBuilder();
 		int decision = -1;
 		int returnNumAuthor = authors.get(authors.size()).getId() + 2;
 		int returnNumPublisher = publishers.get(publishers.size()).getId() + 2;
@@ -331,6 +310,10 @@ public class LibraryManagementSystem {
 			if (bk.getName().length() > 25) {
 				System.out
 						.println("Please make a name that is smaller than 25 characters long, " + "returning to menu");
+				continue;
+			}
+			else if (bk.getName().length() < 1) {
+				System.out.println("Please make sure to input a name before hitting enter");
 				continue;
 			}
 			System.out.println("Who is the author of this book?");
@@ -401,7 +384,10 @@ public class LibraryManagementSystem {
 			if (str.length() > 20) {
 				System.out
 						.println("Please input a name that is smaller than 20 characters long, " + "returning to menu");
-				consoleInput.nextLine();
+				continue;
+			}
+			else if (aut.getName().length() < 1) {
+				System.out.println("Please make sure to input a name before hitting enter");
 				continue;
 			}
 			aut.setName(str.toString());
@@ -417,7 +403,8 @@ public class LibraryManagementSystem {
 				authors.put(aut.getId(), aut);
 				System.out.println("Author '" + aut.getName() + "' has been updated, remember to save!");
 			}
-		} while (false);
+			break;
+		} while (true);
 		return aut.getId();
 	}
 
@@ -430,7 +417,10 @@ public class LibraryManagementSystem {
 			if (str.length() > 10) {
 				System.out
 						.println("Please input a name that is smaller than 10 characters long, " + "returning to menu");
-				consoleInput.nextLine();
+				continue;
+			}
+			else if (pub.getName().length() < 1) {
+				System.out.println("Please make sure to input a name before hitting enter");
 				continue;
 			}
 			pub.setName(str.toString());
@@ -446,7 +436,8 @@ public class LibraryManagementSystem {
 				publishers.put(pub.getId(), pub);
 				System.out.println("Publisher '" + pub.getName() + "' has been updated, remember to save!");
 			}
-		} while (false);
+			break;
+		} while (true);
 		return pub.getId();
 	}
 
@@ -563,12 +554,6 @@ public class LibraryManagementSystem {
 
 	private void save() {
 		StringBuilder line = new StringBuilder();
-//		bookLines.clear();
-//		authorLines.clear();
-//		publisherLines.clear();
-		// TODO mapFlat to lines
-		// bookLines = (ArrayList<String>) books.entrySet().stream().flatMap(x ->
-		// x.getValue()).collect(Collectors.toList());
 		for (Entry<Integer, Book> bk : books.entrySet()) {
 			line.append(bk.getValue().getId() + "\t");
 			line.append(bk.getValue().getName() + "\t");
