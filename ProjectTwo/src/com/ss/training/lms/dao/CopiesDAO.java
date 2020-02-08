@@ -46,4 +46,9 @@ public class CopiesDAO extends BaseDAO<Copies> {
 		return copies;
 	}
 
+	@Override
+	List<Copies> extractDataFirstLevel(ResultSet rs) throws SQLException, ClassNotFoundException {
+		return extractData(rs);
+	}
+
 }

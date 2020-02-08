@@ -6,7 +6,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ss.training.lms.entity.Author;
 import com.ss.training.lms.entity.Book;
+import com.ss.training.lms.entity.Genre;
 import com.ss.training.lms.entity.Publisher;
 
 public class BookDAO extends BaseDAO<Book> {
@@ -32,9 +34,45 @@ public class BookDAO extends BaseDAO<Book> {
 	public List<Book> readBooks() throws ClassNotFoundException, SQLException {
 		return read("select * from tbl_book", null);
 	}
+	
+	public void insertBookAuthors(Author author, Book book) throws ClassNotFoundException, SQLException{
+		save("insert into tbl_book_authors values(?, ?)", new Object[] {author.getAuthorId(), book.getBookId()});
+	}
+	
+	public void deleteBookAuthors(Book book) throws ClassNotFoundException, SQLException{
+		save("delete from tbl_book_authors where bookId = ?", new Object[] {book.getBookId()});
+	}
+	
+	public void insertBookGenres(Genre genre, Book book) throws ClassNotFoundException, SQLException{
+		save("insert into tbl_book_genres values(?, ?)", new Object[] {genre.getGenreId(), book.getBookId()});
+	}
+	
+	public void deleteBookGenres(Book book) throws ClassNotFoundException, SQLException{
+		save("delete form tbl_book_genres where bookId = ?", new Object[] {book.getBookId()});
+	}
 
 	@Override
-	List<Book> extractData(ResultSet rs) throws SQLException {
+	List<Book> extractData(ResultSet rs) throws SQLException, ClassNotFoundException {
+		List<Book> books = new ArrayList<>();
+		AuthorDAO adao = new AuthorDAO(conn);
+		GenreDAO gdao = new GenreDAO(conn);
+		while(rs.next()){
+			Book b = new Book();
+			b.setBookId(rs.getInt("bookId"));
+			b.setTitle(rs.getString("title"));
+			b.setPublisher(new Publisher());
+			b.getPublisher().setPublisherId(rs.getInt("pubId"));
+			b.setAuthors(adao.readFirstLevel("select * from tbl_author where authorId in"
+					+ "(select authorId from tbl_book_authors where bookId = ?)", new Object[] {b.getBookId()}));
+			b.setGenres(gdao.readFirstLevel("select * from tbl_genre where genre_id in"
+					+ "(select genre_id from tbl_book_genres where bookId = ?)", new Object[] {b.getBookId()}));
+			books.add(b);
+		}
+		return books;
+	}
+
+	@Override
+	List<Book> extractDataFirstLevel(ResultSet rs) throws SQLException, ClassNotFoundException {
 		List<Book> books = new ArrayList<>();
 		while(rs.next()){
 			Book b = new Book();

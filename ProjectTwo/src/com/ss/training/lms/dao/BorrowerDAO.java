@@ -28,6 +28,10 @@ public class BorrowerDAO extends BaseDAO<Borrower> {
 		save("delete from tbl_borrower where cardNo = ?", new Object[] {borrower.getCardNo()});
 	}
 	
+//	public void deleteBorrowerLoans(Borrower borrower) throws ClassNotFoundException, SQLException {
+//		save("delete from tbl_book_loans where cardNo = ?", new Object[] {borrower.getCardNo()});
+//	}
+	
 	public List<Borrower> readBorrower() throws ClassNotFoundException, SQLException {
 		return read("select * from tbl_borrower", null);
 	}
@@ -44,6 +48,11 @@ public class BorrowerDAO extends BaseDAO<Borrower> {
 			borrowers.add(b);
 		}
 		return borrowers;
+	}
+
+	@Override
+	List<Borrower> extractDataFirstLevel(ResultSet rs) throws SQLException, ClassNotFoundException {
+		return extractData(rs);
 	}
 
 }

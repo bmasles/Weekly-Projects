@@ -51,4 +51,9 @@ public class LoansDAO extends BaseDAO<Loans> {
 		return loans;
 	}
 
+	@Override
+	List<Loans> extractDataFirstLevel(ResultSet rs) throws SQLException, ClassNotFoundException {
+		return extractData(rs);
+	}
+
 }
