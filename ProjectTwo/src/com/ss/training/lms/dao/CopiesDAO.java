@@ -29,6 +29,16 @@ public class CopiesDAO extends BaseDAO<Copies> {
 				,new Object[] {copies.getBookId(),copies.getBranchId()});
 	}
 	
+	public void deleteCopiesByBookId(Integer bookId) throws ClassNotFoundException, SQLException {
+		save("delete from tbl_book_copies where bookId = ?"
+				, new Object[] {bookId});
+	}
+	
+	public void deleteCopiesByBranchId(Integer bookId) throws ClassNotFoundException, SQLException {
+		save("delete from tbl_book_copies where branchId = ?"
+				, new Object[] {bookId});
+	}
+	
 	public List<Copies> readCopies() throws ClassNotFoundException, SQLException {
 		return read("select * from tbl_book_copies", null);
 	}

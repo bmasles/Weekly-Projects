@@ -109,9 +109,11 @@ public class AdministratorService {
 	public void deleteBook(Book book) {
 		try (Connection conn = connUtil.getConnection()) {
 			BookDAO bdao = new BookDAO(conn);
+			CopiesDAO cdao = new CopiesDAO(conn);
 			bdao.deleteBook(book);
 			bdao.deleteBookAuthors(book);
 			bdao.deleteBookGenres(book);
+			cdao.deleteCopiesByBookId(book.getBookId());
 			conn.commit();
 		} catch (ClassNotFoundException | SQLException e) {
 			System.out.println("Could not delete book");
@@ -382,24 +384,3 @@ public class AdministratorService {
 		return null;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
