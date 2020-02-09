@@ -56,12 +56,12 @@ public class BookDAO extends BaseDAO<Book> {
 		List<Book> books = new ArrayList<>();
 		AuthorDAO adao = new AuthorDAO(conn);
 		GenreDAO gdao = new GenreDAO(conn);
+		PublisherDAO pdao = new PublisherDAO(conn);
 		while(rs.next()){
 			Book b = new Book();
 			b.setBookId(rs.getInt("bookId"));
 			b.setTitle(rs.getString("title"));
-			b.setPublisher(new Publisher());
-			b.getPublisher().setPublisherId(rs.getInt("pubId"));
+			b.setPublisher(pdao.readPublisherById(rs.getInt("pubId")));
 			b.setAuthors(adao.readFirstLevel("select * from tbl_author where authorId in"
 					+ "(select authorId from tbl_book_authors where bookId = ?)", new Object[] {b.getBookId()}));
 			b.setGenres(gdao.readFirstLevel("select * from tbl_genre where genre_id in"
