@@ -86,7 +86,6 @@ public class AdministratorService {
 				bdao.insertBookGenres(gen, book);
 			conn.commit();
 		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
 			System.out.println("Could not save book");
 		}
 	}

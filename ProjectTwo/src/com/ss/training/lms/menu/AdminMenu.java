@@ -49,9 +49,17 @@ public class AdminMenu {
 				deleteBook();
 				break;
 			case 4:
+				System.out.format("%-45s%-45s%-45s%-45s%n", "Book Title", "Book Authors", "Publisher", "Book Genres");
+				System.out.println();
 				for (Book book : admin.readBook()) {
-					System.out.println(book.getTitle() + " " + book.getAuthors() + " "
-							+ book.getPublisher().getPublisherName() + " " + book.getGenres());
+					StringBuilder strAuthor = new StringBuilder();
+					StringBuilder strGenre = new StringBuilder();
+					for (Author auth : book.getAuthors())
+						strAuthor.append(auth.getAuthorName() + ", ");
+					for (Genre gen : book.getGenres())
+						strGenre.append(gen.getGenreName() + ", ");
+					System.out.format("%-45s%-55s%-45s%-55s%n", book.getTitle(), strAuthor.toString()
+							, book.getPublisher().getPublisherName(), strGenre.toString());
 				}
 				continue;
 			case 5:
@@ -466,8 +474,14 @@ public class AdminMenu {
 				deleteAuthor();
 				break;
 			case 4:
-				for (Author auth : admin.readAuthor())
-					System.out.println(auth.getAuthorName() + auth.getBooks());
+				System.out.format("%-45s%-60s%n", "Author Name", "Books by author");
+				System.out.println();
+				for (Author auth : admin.readAuthor()) {
+					StringBuilder strBook = new StringBuilder();
+					for (Book book : auth.getBooks())
+						strBook.append(book.getTitle() + ", ");
+					System.out.format("%-45s%-60s%n", auth.getAuthorName(), strBook.toString());
+				}
 				continue;
 			case 5:
 				return;
@@ -607,9 +621,12 @@ public class AdminMenu {
 				deletePublisher();
 				break;
 			case 4:
-				for (Publisher pub : admin.readPublisher())
-					System.out.println(pub.getPublisherName() + "  " + pub.getPublisherAddress() + "   "
-							+ pub.getPublisherPhone());
+				System.out.format("%-45s%-45s%-45s%n", "Publisher Name", "Publisher Address", "Publisher phone number");
+				System.out.println();
+				for (Publisher pub : admin.readPublisher()) {
+					System.out.format("%-45s%-45s%-45s%n", pub.getPublisherName()
+							, pub.getPublisherAddress(), pub.getPublisherPhone());
+				}
 				continue;
 			case 5:
 				return;
@@ -796,8 +813,14 @@ public class AdminMenu {
 				deleteGenre();
 				break;
 			case 4:
-				for (Genre gen : admin.readGenre())
-					System.out.println(gen.getGenreName() + gen.getBooks());
+				System.out.format("%-45s%-60s%n", "Genre Name", "Books under genre");
+				System.out.println();
+				for (Genre gen : admin.readGenre()) {
+					StringBuilder strBook = new StringBuilder();
+					for (Book book : gen.getBooks())
+						strBook.append(book.getTitle() + ", ");
+					System.out.format("%-45s%-60s%n", gen.getGenreName(), strBook.toString());
+				}
 				continue;
 			case 5:
 				return;
@@ -938,8 +961,10 @@ public class AdminMenu {
 				deleteBranch();
 				break;
 			case 4:
-				for (Branch brch : admin.readBranch())
-					System.out.println(brch.getBranchName() + "   " + brch.getBranchAddress());
+				System.out.format("%-45s%-45s%n", "Branch Name", "Branch Address");
+				for (Branch brch : admin.readBranch()) {
+					System.out.format("%-45s%-45s%n", brch.getBranchName(), brch.getBranchAddress());
+				}
 				continue;
 			case 5:
 				return;
@@ -1102,8 +1127,11 @@ public class AdminMenu {
 				deleteBorrower();
 				break;
 			case 4:
-				for (Borrower bor : admin.readBorrower())
-					System.out.println(bor.getName() + "   " + bor.getAddress() + "   " + bor.getPhone());
+				System.out.format("%-45s%-45s%-45s%n", "Borrower Name", "Borrower Address", "Borrower Phone");
+				System.out.println();
+				for (Borrower bor : admin.readBorrower()) {
+					System.out.format("%-45s%-45s%-45s%n", bor.getName(), bor.getAddress(), bor.getPhone());
+				}
 				continue;
 			case 5:
 				return;
@@ -1283,29 +1311,28 @@ public class AdminMenu {
 			switch (decision) {
 			case 1:
 				bookSubMenu();
-				break;
+				continue;
 			case 2:
 				authorSubMenu();
-				break;
+				continue;
 			case 3:
 				publisherSubMenu();
-				break;
+				continue;
 			case 4:
 				genreSubMenu();
-				break;
+				continue;
 			case 5:
 				branchSubMenu();
-				break;
+				continue;
 			case 6:
 				borrowerSubMenu();
-				break;
+				continue;
 			case 7:
-				break;
+				return;
 			default:
 				System.out.println("Please enter a valid number");
 				continue;
 			}
-			break;
 		} while (decision != 7);
 	}
 

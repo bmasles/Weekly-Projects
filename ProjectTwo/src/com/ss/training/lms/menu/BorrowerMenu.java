@@ -64,6 +64,7 @@ public class BorrowerMenu {
 		int decision = 0;
 		int index = 0;
 		List<Copies> copies = admin.readCopiesById(currentBranch.getBranchId());
+		System.out.println("Which book would you like to check out?");
 		do {
 			for (Copies copy : copies) {
 				System.out.println(++index + ". " + admin.readBookById(copy.getBookId()).getTitle() + "   "
@@ -87,7 +88,7 @@ public class BorrowerMenu {
 			break;
 		} while (true);
 		Copies copy = copies.get(decision - 1);
-		copy.setNoOfCopies(copy.getNoOfCopies() + 1);
+		copy.setNoOfCopies(copy.getNoOfCopies() - 1);
 		admin.updateCopies(copy);
 		Loans loan = new Loans();
 		loan.setBookId(copy.getBookId());

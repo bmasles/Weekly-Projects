@@ -29,7 +29,7 @@ public class PublisherDAO extends BaseDAO<Publisher> {
 	}
 	
 	public void deletePublisherBooks(Publisher pub) throws ClassNotFoundException, SQLException {
-		save("delete from tbl_book where publisherId = ?", new Object[] {pub.getPublisherId()});
+		save("delete from tbl_publisher where publisherId = ?", new Object[] {pub.getPublisherId()});
 	}
 	
 	public List<Publisher> readPublisher() throws ClassNotFoundException, SQLException {
