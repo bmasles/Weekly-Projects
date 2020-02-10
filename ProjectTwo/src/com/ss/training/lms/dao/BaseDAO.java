@@ -24,11 +24,11 @@ public abstract class BaseDAO<T> {
 				index++;
 			}
 		}
-		ResultSet rs = pstmt.executeQuery();
+		pstmt.executeUpdate();
+		ResultSet rs = pstmt.getGeneratedKeys();
 		while(rs.next()){
 			return rs.getInt(1);
 		}
-		
 		return null;
 	}
 	

@@ -15,8 +15,8 @@ public class GenreDAO extends BaseDAO<Genre> {
 		super(conn);
 	}
 	
-	public void addGenre(Genre genre) throws ClassNotFoundException, SQLException {
-		save("insert into tbl_genre (genre_name) values (?)", 
+	public Integer addGenre(Genre genre) throws ClassNotFoundException, SQLException {
+		return save("insert into tbl_genre (genre_name) values (?)", 
 				new Object[] {genre.getGenreName()});
 	}
 
@@ -38,7 +38,7 @@ public class GenreDAO extends BaseDAO<Genre> {
 	}
 	
 	public void deleteBookGenres(Genre genre) throws ClassNotFoundException, SQLException{
-		save("delete form tbl_book_genres where genre_id = ?", new Object[] {genre.getGenreId()});
+		save("delete from tbl_book_genres where genre_id = ?", new Object[] {genre.getGenreId()});
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class GenreDAO extends BaseDAO<Genre> {
 			gn.setGenreId(rs.getInt("genre_id"));
 			gn.setGenreName(rs.getString("genre_name"));
 			gn.setBooks(bdao.readFirstLevel("select * from tbl_book where bookId in"
-					+ "(select bookId from tbl_book_genre where genre_id = ?)", new Object[] {gn.getGenreId()}));
+					+ "(select bookId from tbl_book_genres where genre_id = ?)", new Object[] {gn.getGenreId()}));
 			genres.add(gn);
 		}
 		return genres;

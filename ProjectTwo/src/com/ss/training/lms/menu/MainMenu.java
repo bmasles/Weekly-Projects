@@ -7,17 +7,17 @@ import com.ss.training.lms.service.AdministratorService;
 public class MainMenu {
 
 	private Scanner consoleInput;
-	private borrowerMenu bMenu;
-	private librarianMenu lMenu;
-	private adminMenu aMenu;
+	private BorrowerMenu bMenu;
+	private LibrarianMenu lMenu;
+	private AdminMenu aMenu;
 	private AdministratorService admin;
 
 	MainMenu() {
 		consoleInput = new Scanner(System.in);
 		admin = new AdministratorService();
-		bMenu = new borrowerMenu(consoleInput, admin);
-		lMenu = new librarianMenu(consoleInput, admin);
-		aMenu = new adminMenu(consoleInput, admin);
+		bMenu = new BorrowerMenu(consoleInput, admin);
+		lMenu = new LibrarianMenu(consoleInput, admin);
+		aMenu = new AdminMenu(consoleInput, admin);
 	}
 
 	public void start() {
@@ -46,12 +46,14 @@ public class MainMenu {
 			case 3:
 				aMenu.start();
 				break;
+			case 4:
+				break;
 			default:
 				System.out.println("Please enter a valid number");
 				continue;
 			}
-			break;
 		} while (decision != 4);
+		System.out.println("Goodbye!");
 		consoleInput.close();
 	}
 

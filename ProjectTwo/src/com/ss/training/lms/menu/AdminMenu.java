@@ -12,11 +12,11 @@ import com.ss.training.lms.entity.Genre;
 import com.ss.training.lms.entity.Publisher;
 import com.ss.training.lms.service.AdministratorService;
 
-public class adminMenu {
+public class AdminMenu {
 	private Scanner consoleInput;
 	private AdministratorService admin;
 
-	public adminMenu(Scanner consoleInput, AdministratorService admin) {
+	public AdminMenu(Scanner consoleInput, AdministratorService admin) {
 		this.admin = admin;
 		this.consoleInput = consoleInput;
 	}
@@ -53,14 +53,13 @@ public class adminMenu {
 					System.out.println(book.getTitle() + " " + book.getAuthors() + " "
 							+ book.getPublisher().getPublisherName() + " " + book.getGenres());
 				}
-				break;
+				continue;
 			case 5:
-				break;
+				return;
 			default:
 				System.out.println("Please enter a valid number");
 				continue;
 			}
-			break;
 		} while (true);
 	}
 
@@ -296,9 +295,12 @@ public class adminMenu {
 				System.out.println("Please make sure to input a name before hitting enter");
 				continue;
 			}
+			book.setAuthors(new ArrayList<Author>());
 			outerAuthor: // All the looping for the inclusion of authors to this book and the addition of
 							// new ones
 			do {
+				index = 0;
+				str.setLength(0);
 				System.out.println("Who is/are the author/s of this book?");
 				if (authors == null)
 					authors = admin.readAuthor();
@@ -319,7 +321,6 @@ public class adminMenu {
 					consoleInput.nextLine();
 					continue;
 				}
-				book.setAuthors(new ArrayList<Author>());
 				if (decision == index)
 					return;
 				if (decision == index - 1) {
@@ -334,9 +335,9 @@ public class adminMenu {
 				do {
 					System.out.println("Is there another author to add to this book? (y/n)");
 					str.append(consoleInput.next());
-					if (str.toString() == "y" || str.toString() == "Y")
+					if (str.toString().equals("y") || str.toString().equals("Y"))
 						continue outerAuthor;
-					else if (str.toString() == "n" || str.toString() == "N")
+					else if (str.toString().equals("n") || str.toString().equals("N"))
 						break;
 					else {
 						System.out.println("Please enter either y or n as a response");
@@ -345,9 +346,12 @@ public class adminMenu {
 				} while (true);
 				break;
 			} while (true);
+			book.setGenres(new ArrayList<Genre>());
 			outerGenre: // All the looping for the inclusion of genres to the book except cannot add
 						// new ones
 			do {
+				index = 0;
+				str.setLength(0);
 				System.out.println("What is/are the genre/s of this book?");
 				if (genres == null)
 					genres = admin.readGenre();
@@ -368,7 +372,6 @@ public class adminMenu {
 					consoleInput.nextLine();
 					continue;
 				}
-				book.setGenres(new ArrayList<Genre>());
 				if (decision == index)
 					return;
 				if (decision == index - 1) {
@@ -383,9 +386,9 @@ public class adminMenu {
 				do {
 					System.out.println("Is there another genre to add to the book? (y/n)");
 					str.append(consoleInput.next());
-					if (str.toString() == "y" || str.toString() == "Y")
+					if (str.toString().equals("y") || str.toString().equals("Y"))
 						continue outerGenre;
-					else if (str.toString() == "n" || str.toString() == "N")
+					else if (str.toString().equals("n") || str.toString().equals("N"))
 						break;
 					else {
 						System.out.println("Please enter either y or n as a response");
@@ -395,6 +398,8 @@ public class adminMenu {
 				break;
 			} while (true);
 			outerPublisher: do {
+				index = 0;
+				str.setLength(0);
 				System.out.println("Who published this book?");
 				if (publishers == null)
 					publishers = admin.readPublisher();
@@ -423,7 +428,7 @@ public class adminMenu {
 						return;
 					book.setPublisher(p);
 				} else {
-					book.setPublisher(publishers.get(index - 1));
+					book.setPublisher(publishers.get(decision - 1));
 				}
 				break;
 			} while (true);
@@ -463,14 +468,13 @@ public class adminMenu {
 			case 4:
 				for (Author auth : admin.readAuthor())
 					System.out.println(auth.getAuthorName() + auth.getBooks());
-				break;
+				continue;
 			case 5:
-				break;
+				return;
 			default:
 				System.out.println("Please enter a valid number");
 				continue;
 			}
-			break;
 		} while (true);
 	}
 
@@ -514,7 +518,7 @@ public class adminMenu {
 		List<Author> authors = null;
 		Author author = new Author();
 		do {
-			System.out.println("Which author would you like to delete?");
+			System.out.println("Which author would you like to update?");
 			System.out.println("NOTE: All books that have been writen by this author will also be removed");
 			if (authors == null)
 				authors = admin.readAuthor();
@@ -537,7 +541,7 @@ public class adminMenu {
 			if (decision == index)
 				return;
 			author.setAuthorId(authors.get(decision - 1).getAuthorId());
-			
+
 			System.out.println("What is the name of the author?");
 			author.setAuthorName(consoleInput.nextLine());
 			if (author.getAuthorName().length() > 45) {
@@ -556,6 +560,7 @@ public class adminMenu {
 
 	private Author createAuthor() {
 		Author author = new Author();
+		author.setBooks(new ArrayList<Book>());
 		do {
 			System.out.println("What is the name of the author?");
 			author.setAuthorName(consoleInput.nextLine());
@@ -605,14 +610,13 @@ public class adminMenu {
 				for (Publisher pub : admin.readPublisher())
 					System.out.println(pub.getPublisherName() + "  " + pub.getPublisherAddress() + "   "
 							+ pub.getPublisherPhone());
-				break;
+				continue;
 			case 5:
-				break;
+				return;
 			default:
 				System.out.println("Please enter a valid number");
 				continue;
 			}
-			break;
 		} while (true);
 	}
 
@@ -656,8 +660,7 @@ public class adminMenu {
 		List<Publisher> publishers = null;
 		Publisher publisher = new Publisher();
 		do {
-			System.out.println("Which publisher would you like to delete?");
-			System.out.println("NOTE: All books that have been writen by this publisher will also be removed");
+			System.out.println("Which publisher would you like to update?");
 			if (publishers == null)
 				publishers = admin.readPublisher();
 			for (Publisher pub : publishers) {
@@ -679,7 +682,7 @@ public class adminMenu {
 			if (decision == index)
 				return;
 			publisher.setPublisherId(publishers.get(decision - 1).getPublisherId());
-			
+
 			do {
 				System.out.println("What is the name of the publisher?");
 				publisher.setPublisherName(consoleInput.nextLine());
@@ -795,14 +798,13 @@ public class adminMenu {
 			case 4:
 				for (Genre gen : admin.readGenre())
 					System.out.println(gen.getGenreName() + gen.getBooks());
-				break;
+				continue;
 			case 5:
-				break;
+				return;
 			default:
 				System.out.println("Please enter a valid number");
 				continue;
 			}
-			break;
 		} while (true);
 	}
 
@@ -845,7 +847,7 @@ public class adminMenu {
 		List<Genre> genres = null;
 		Genre genre = new Genre();
 		do {
-			System.out.println("Which genre would you like to delete?");
+			System.out.println("Which genre would you like to update?");
 			if (genres == null)
 				genres = admin.readGenre();
 			for (Genre gen : genres) {
@@ -867,13 +869,13 @@ public class adminMenu {
 			if (decision == index)
 				return;
 			genre.setGenreId(genres.get(decision - 1).getGenreId());
-			
+
 			do {
 				System.out.println("What is the name of the genre?");
 				genre.setGenreName(consoleInput.nextLine());
 				if (genre.getGenreName().length() > 45) {
-					System.out
-							.println("Please make a name that is smaller than 45 characters long, " + "returning to menu");
+					System.out.println(
+							"Please make a name that is smaller than 45 characters long, " + "returning to menu");
 					continue;
 				} else if (genre.getGenreName().length() < 1) {
 					System.out.println("Please make sure to input a name before hitting enter");
@@ -889,6 +891,7 @@ public class adminMenu {
 
 	private Genre createGenre() {
 		Genre gen = new Genre();
+		gen.setBooks(new ArrayList<Book>());
 		do {
 			System.out.println("What is the name of the genre?");
 			gen.setGenreName(consoleInput.nextLine());
@@ -937,14 +940,13 @@ public class adminMenu {
 			case 4:
 				for (Branch brch : admin.readBranch())
 					System.out.println(brch.getBranchName() + "   " + brch.getBranchAddress());
-				break;
+				continue;
 			case 5:
-				break;
+				return;
 			default:
 				System.out.println("Please enter a valid number");
 				continue;
 			}
-			break;
 		} while (true);
 	}
 
@@ -988,8 +990,7 @@ public class adminMenu {
 		List<Branch> branches = null;
 		Branch branch = new Branch();
 		do {
-			System.out.println("Which Branch would you like to delete?");
-			System.out.println("NOTE: All copies will be deleted from that branch");
+			System.out.println("Which Branch would you like to update?");
 			if (branches == null)
 				branches = admin.readBranch();
 			for (Branch brch : branches) {
@@ -1011,7 +1012,7 @@ public class adminMenu {
 			if (decision == index)
 				return;
 			branch.setBranchId(branches.get(decision - 1).getBranchId());
-			
+
 			do {
 				System.out.println("What is the name of the branch?");
 				branch.setBranchName(consoleInput.nextLine());
@@ -1103,14 +1104,13 @@ public class adminMenu {
 			case 4:
 				for (Borrower bor : admin.readBorrower())
 					System.out.println(bor.getName() + "   " + bor.getAddress() + "   " + bor.getPhone());
-				break;
+				continue;
 			case 5:
-				break;
+				return;
 			default:
 				System.out.println("Please enter a valid number");
 				continue;
 			}
-			break;
 		} while (true);
 	}
 
@@ -1175,7 +1175,7 @@ public class adminMenu {
 			if (decision == index)
 				return;
 			borrower.setCardNo(borrowers.get(decision - 1).getCardNo());
-			
+
 			do {
 				System.out.println("What is the name of the borrower?");
 				borrower.setName(consoleInput.nextLine());

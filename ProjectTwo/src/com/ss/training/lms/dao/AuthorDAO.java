@@ -22,8 +22,8 @@ public class AuthorDAO extends BaseDAO<Author> {
 		super(conn);
 	}
 
-	public void addAuthor(Author author) throws ClassNotFoundException, SQLException {
-		save("insert into tbl_author (authorName) values (?)", new Object[] { author.getAuthorName() });
+	public Integer addAuthor(Author author) throws ClassNotFoundException, SQLException {
+		return save("insert into tbl_author (authorName) values (?)", new Object[] { author.getAuthorName() });
 	}
 
 	public void updateAuthor(Author author) throws SQLException, ClassNotFoundException {
@@ -35,7 +35,7 @@ public class AuthorDAO extends BaseDAO<Author> {
 	}
 	
 	public void insertBookAuthors(Author author, Book book) throws ClassNotFoundException, SQLException{
-		save("insert into tbl_book_authors values(?, ?)", new Object[] {author.getAuthorId(), book.getBookId()});
+		save("insert into tbl_book_authors values(?, ?)", new Object[] {book.getBookId(),author.getAuthorId()});
 	}
 	
 	public void deleteBookAuthors(Author author) throws ClassNotFoundException, SQLException{

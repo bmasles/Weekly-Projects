@@ -27,12 +27,22 @@ public class LoansDAO extends BaseDAO<Loans> {
 	}
 
 	public void deleteLoans(Loans loan) throws ClassNotFoundException, SQLException {
-		save("delete from tbl_book_loans where bookId = ?, branchId = ?, cardNo = ?",
+		save("delete from tbl_book_loans where bookId = ? and branchId = ? and cardNo = ?",
 				new Object[] {loan.getBookId(),loan.getBranchId(),loan.getCardNo()});
 	}
 	
 	public List<Loans> readLoans() throws ClassNotFoundException, SQLException {
 		return read("select * from tbl_book_loans", null);
+	}
+	
+	public List<Loans> readCurrentLoans(Integer branchId, Integer cardNo) throws ClassNotFoundException, SQLException {
+		return read("select * from tbl_book_loans where branchId = ? and cardNo = ? and dateIn is null",
+				new Object[] {branchId,cardNo});
+	}
+	
+	public List<Loans> readCurrentLoans(Integer branchId, Integer cardNo, Integer bookId) throws ClassNotFoundException, SQLException {
+		return read("select * from tbl_book_loans where branchId = ? and cardNo = ? and bookId = ? and dateIn is null",
+				new Object[] {branchId,cardNo,bookId});
 	}
 
 	@Override

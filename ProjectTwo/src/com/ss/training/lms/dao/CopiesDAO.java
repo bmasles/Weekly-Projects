@@ -20,7 +20,7 @@ public class CopiesDAO extends BaseDAO<Copies> {
 	}
 
 	public void updateCopies(Copies copies) throws SQLException, ClassNotFoundException {
-		save("update tbl_book_copies set noOfcopies where bookId = ? and branchId = ?", 
+		save("update tbl_book_copies set noOfCopies = ? where bookId = ? and branchId = ?", 
 				new Object[]{copies.getNoOfCopies(),copies.getBookId(),copies.getBranchId()} );
 	}
 
@@ -41,6 +41,16 @@ public class CopiesDAO extends BaseDAO<Copies> {
 	
 	public List<Copies> readCopies() throws ClassNotFoundException, SQLException {
 		return read("select * from tbl_book_copies", null);
+	}
+	
+	public List<Copies> readCopyById(Integer branchId) throws ClassNotFoundException, SQLException {
+		return read("select * from tbl_book_copies where branchId = ?",
+				new Object[] {branchId});
+	}
+	
+	public List<Copies> readCopyById(Integer branchId, Integer bookId) throws ClassNotFoundException, SQLException {
+		return read("select * from tbl_book_copies where branchId = ? and bookId = ?",
+				new Object[] {branchId,bookId});
 	}
 
 	@Override

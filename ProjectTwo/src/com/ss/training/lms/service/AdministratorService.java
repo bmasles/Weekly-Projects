@@ -29,7 +29,7 @@ public class AdministratorService {
 	public void saveAuthor(Author auth) {
 		try (Connection conn = connUtil.getConnection()) {
 			AuthorDAO adao = new AuthorDAO(conn);
-			adao.addAuthor(auth);
+			auth.setAuthorId(adao.addAuthor(auth));
 			for (Book bk: auth.getBooks())
 				adao.insertBookAuthors(auth, bk);
 			conn.commit();
@@ -79,13 +79,14 @@ public class AdministratorService {
 	public void saveBook(Book book) {
 		try (Connection conn = connUtil.getConnection()) {
 			BookDAO bdao = new BookDAO(conn);
-			bdao.addBook(book);
+			book.setBookId(bdao.addBook(book));
 			for (Author aut: book.getAuthors()) 
 				bdao.insertBookAuthors(aut, book);
 			for (Genre gen: book.getGenres()) 
 				bdao.insertBookGenres(gen, book);
 			conn.commit();
 		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
 			System.out.println("Could not save book");
 		}
 	}
@@ -130,11 +131,21 @@ public class AdministratorService {
 		return null;
 	}
 	
+	public Book readBookById(Integer bookId) {
+		try (Connection conn = connUtil.getConnection()) {
+			BookDAO bdao = new BookDAO(conn);
+			return bdao.readBookById(bookId);
+		} catch (ClassNotFoundException | SQLException e) {
+			System.out.println("Could not read book");
+		}
+		return null;
+	}
+	
 	
 	public void saveGenre(Genre gen) {
 		try (Connection conn = connUtil.getConnection()) {
 			GenreDAO gdao = new GenreDAO(conn);
-			gdao.addGenre(gen);
+			gen.setGenreId(gdao.addGenre(gen));
 			for (Book bk: gen.getBooks())
 				gdao.insertBookGenres(gen, bk);
 			conn.commit();
@@ -172,7 +183,7 @@ public class AdministratorService {
 			GenreDAO gdao = new GenreDAO(conn);
 			return gdao.readGenre();
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Could not delete genre");
+			System.out.println("Could not read genre");
 		}
 		return null;
 	}
@@ -301,6 +312,26 @@ public class AdministratorService {
 		return null;
 	}
 	
+	public List<Copies> readCopiesById(Integer branchId) {
+		try (Connection conn = connUtil.getConnection()) {
+			CopiesDAO cdao = new CopiesDAO(conn);
+			return cdao.readCopyById(branchId);
+		} catch (ClassNotFoundException | SQLException e) {
+			System.out.println("Could not read copies");
+		}
+		return null;
+	}
+	
+	public Copies readCopyById(Integer branchId, Integer bookId) {
+		try (Connection conn = connUtil.getConnection()) {
+			CopiesDAO cdao = new CopiesDAO(conn);
+			return cdao.readCopyById(branchId, bookId).get(0);
+		} catch (ClassNotFoundException | SQLException e) {
+			System.out.println("Could not read copies");
+		}
+		return null;
+	}
+	
 	
 	public void saveLoans(Loans ln) {
 		try (Connection conn = connUtil.getConnection()) {
@@ -342,11 +373,31 @@ public class AdministratorService {
 		return null;
 	}
 	
+	public List<Loans> readLoans(Integer branchId, Integer cardNo) {
+		try (Connection conn = connUtil.getConnection()) {
+			LoansDAO ldao = new LoansDAO(conn);
+			return ldao.readCurrentLoans(branchId, cardNo);
+		} catch (ClassNotFoundException | SQLException e) {
+			System.out.println("Could not read loans");
+		}
+		return null;
+	}
+	
+	public Loans readLoans(Integer branchId, Integer cardNo, Integer bookId) {
+		try (Connection conn = connUtil.getConnection()) {
+			LoansDAO ldao = new LoansDAO(conn);
+			return ldao.readCurrentLoans(branchId, cardNo, bookId).get(0);
+		} catch (ClassNotFoundException | SQLException e) {
+			System.out.println("Could not read loans");
+		}
+		return null;
+	}
+	
 	
 	public void savePublisher(Publisher pub) {
 		try (Connection conn = connUtil.getConnection()) {
 			PublisherDAO pdao = new PublisherDAO(conn);
-			pdao.addPublisher(pub);
+			pub.setPublisherId(pdao.addPublisher(pub));
 			conn.commit();
 		} catch (ClassNotFoundException | SQLException e) {
 			System.out.println("Could not creat publisher");
@@ -370,6 +421,7 @@ public class AdministratorService {
 			pdao.deletePublisherBooks(pub);
 			conn.commit();
 		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
 			System.out.println("Could not delete publisher");
 		}
 	}
